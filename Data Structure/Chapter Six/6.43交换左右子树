@@ -1,0 +1,144 @@
+//创建日期：2024年11月13日
+//创建人：StaryNight2005
+//程序说明： 通过递归方式交换树的所有左右子树 
+//输入示例： 3 1 2 3 4 5 6 7
+//输出示例： 1 2 3 4 5 6 7   1 5 7 6 2 4 3
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct BinTree {
+	int num;
+	struct BinTree* Parent;
+	struct BinTree* Left;
+	struct BinTree* Right;
+}bin, * Bin;
+
+//创建新节点 
+Bin CreateCode(Bin Par, int num) {
+	Bin newcode = (Bin)malloc(sizeof(bin));
+
+	newcode->Parent = Par;
+	newcode->num = num;
+	newcode->Left = NULL;
+	newcode->Right = NULL;
+
+	return newcode;
+}
+
+//递归建立n层完全满二叉树 
+void CreateTree(Bin* Tree, int n) {
+	if (n == 0) {
+		return;
+	}
+
+	int num;
+
+
+	if (*Tree == NULL) {
+		printf("输入新增节点:");
+		scanf("%d", &num);
+		*Tree = CreateCode(NULL, num);
+		n--;
+	}
+
+	//递归建立左子树 
+	if ((*Tree)->Left == NULL) {
+		printf("输入新增节点:");
+		scanf("%d", &num);
+		(*Tree)->Left = CreateCode(*Tree, num);
+		CreateTree(&((*Tree)->Left), n - 1);//左子树为根建立新树 
+	}
+
+	//递归建立右子树 
+	if ((*Tree)->Right == NULL) {
+		printf("输入新增节点:");
+		scanf("%d", &num);
+		(*Tree)->Right = CreateCode(*Tree, num);
+		CreateTree(&((*Tree)->Right), n - 1);//右子树为根建立新树 
+	}
+}
+
+//交换树的所有左右子树 
+void ExchangeTree(Bin* Tree){
+	Bin temp;
+	
+	//如果为叶子，结束交换 
+	if((*Tree)->Left == NULL && (*Tree)->Right == NULL) 
+		return;
+		
+	//交换左子树的左右子树 
+	ExchangeTree(&((*Tree)->Left));
+	
+	//交换右子树的左右子树
+	ExchangeTree(&((*Tree)->Right)); 
+	
+	//交换左右子树 
+	temp = (*Tree)->Left;
+	(*Tree)->Left = (*Tree)->Right;
+	(*Tree)->Right = temp;
+	
+}
+
+//前序遍历树 
+void VisitTree(Bin Tree){
+	
+	printf("%d ",Tree->num);
+	
+	//遍历左子树 
+	if(Tree->Left)
+		VisitTree(Tree->Left);
+	
+	//遍历右子树
+	if(Tree->Right)
+		VisitTree(Tree->Right); 
+}
+
+//释放树 
+void DestroyTree(Bin* Tree){
+	
+	//释放左子树 
+	if((*Tree)->Left){
+		DestroyTree(&((*Tree)->Left));
+		
+		(*Tree)->Left = NULL;
+	}
+	
+	//释放右子树 
+	if((*Tree)->Right){
+		DestroyTree(&(*Tree)->Right);
+		
+		(*Tree)->Right = NULL;
+	}
+	
+	//释放自己 
+	if((*Tree)->Left == NULL && (*Tree)->Right == NULL){
+		free(*Tree);
+	}
+} 
+
+int main() {
+
+	Bin tree = NULL;
+	int high, num;
+	
+	printf("请输入创建的树的高度:");
+	scanf("%d", &high);
+
+	CreateTree(&tree, high);
+	
+	printf("交换前前序遍历树：\n");
+	VisitTree(tree);
+	
+	ExchangeTree(&tree);
+	
+	printf("\n交换后前序遍历树:\n");
+	VisitTree(tree);
+	
+	
+	DestroyTree(&tree); 
+	
+	return 0;
+}
